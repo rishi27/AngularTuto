@@ -1,0 +1,161 @@
+customers menu
+--------------
+<div>
+    <div class="container">
+        <div class="row">
+                 <div>
+                     <header>
+                         <h3>
+                         <span class="glyphicon glyphicon-user"></span>
+                         Customer Application
+                         </h3>
+                     </header>
+                 </div>
+               <div class="col-md-10">
+                   <div class="navbar">
+                       <ul class="nav navbar-nav">
+                           <li  class="toolbaritem">
+                               <a>
+                                   <span class="glyphicon glyphicon-th-large"></span> Card View                           			 </a>
+                           </li>
+                           <li class="toolbaritem">
+                               <a>
+                                   <span class="glyphicon glyphicon-align-justify"></span> ListView
+                               </a>
+                           </li>
+                       </ul>
+                       <form class="navbar-form navbar-right">
+                           <div class="form-group">
+                               <label class="navbarText col-sm-2">Filter:</label>
+                               <div class="col-sm-10">
+                                   <input type="text" class="novalidate form-control" />
+                               </div>
+                           </div>
+                       </form>
+                   </div>
+               </div>
+           </div>
+   </div>
+ 
+</div>
+
+-----------------
+
+card css 
+--------
+.card-container {
+    width:85%;
+}
+
+.card {
+    background-color:#fff;
+    border: 1px solid #d4d4d4;
+    height:120px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.card-header {
+    background-color:#027FF4;
+    font-size:14pt;
+    color:white;
+    padding:5px;
+    width:100%;
+}
+
+.card-close {
+    color: white;
+    font-weight:bold;
+    margin-right:5px;
+}
+
+.card-body {
+    padding-left: 5px;
+}
+
+.card-body-left {
+    margin-top: -5px;
+}
+
+.card-body-right {
+    margin-left: 20px;
+    margin-top: 2px;
+}
+
+.card-body-content {
+    width: 100px;
+}
+
+.card-image {
+    height:50px;width:50px;margin-top:10px;
+}
+
+.white {
+    color: white;
+}
+
+.white:hover {
+    color: white;
+}
+
+
+
+
+Services:
+---------
+import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/throw';
+import { Observer } from 'rxjs/Observer';
+import 'rxjs/add/operator/map'; 
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/mergeMap';
+
+
+
+
+ getCustomersWithOrders(id: number): Observable<any> {
+        return Observable.forkJoin([
+          this.http.get('http://localhost:3000/customers/' + id).map(res => res.json()),
+          this.http.get('http://localhost:3000/orders/?customer_id=' + id).map(res => res.json())
+        ])
+        .map((data: any[]) => {
+          let customers: any = data[0];
+          let orders: any[] = data[1];
+          customers.orders = orders;
+          return customers;
+        });
+      }
+
+      getCustomerInfoFromOrder(orderId: number) : Observable<any> {
+        return this.http.get('http://localhost:3000/orders/' +orderId)
+        .map((res: any) => res.json())
+        .flatMap((orders: any) => {
+          return this.http.get('http://localhost:3000/customers/' + orders.customer_id)
+            .map((res: any) => res.json());
+        });
+      }
+
+
+-------------
+
+app.routing.ts 
+
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import {AboutComponent} from './about/about.component';
+
+
+const app_routes: Routes = [
+   { path: '', pathMatch: 'full', redirectTo: '/about' },
+    { path: 'customers', loadChildren: 'app/customers/customers.module#CustomersModule' },
+    { path: 'about', component:AboutComponent },
+    {path :'login', loadChildren: 'app/login/login.module#LoginModule'  },
+    { path: 'customers/:id', loadChildren: 'app/customer/customer.module#CustomerModule'},
+    { path: '**', redirectTo: '/customers' }
+];
+
+ 
+export const AppRoutingModule: ModuleWithProviders = RouterModule.forRoot(app_routes);
