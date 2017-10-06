@@ -166,6 +166,34 @@ export const AppRoutingModule: ModuleWithProviders = RouterModule.forRoot(app_ro
 ---------
 child route
 
+
+
+const routes: Routes = [
+  { 
+    path: '', 
+    component: CustomerComponent,
+    children: [
+      
+      { path:'edit', 
+        component: CustomerEditComponent  ,
+         canActivate: [ CanActivateGuard ],
+         canDeactivate: [ CanDeactivateGuard ] 
+      }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [ RouterModule.forChild(routes) ],
+  exports: [ RouterModule ],
+   providers:    [ CanActivateGuard, CanDeactivateGuard ]
+})
+export class CustomerRoutingModule { 
+  static components = [ CustomerComponent, CustomerEditComponent ];
+}
+
+
+
 ngOnInit() {
       //Subscribe to params so if it changes we pick it up. Don't technically need that here
       //since param won't be changing while component is alive. 
