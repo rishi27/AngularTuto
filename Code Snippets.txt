@@ -159,3 +159,23 @@ const app_routes: Routes = [
 
  
 export const AppRoutingModule: ModuleWithProviders = RouterModule.forRoot(app_routes);
+
+
+
+
+---------
+child route
+
+ngOnInit() {
+      //Subscribe to params so if it changes we pick it up. Don't technically need that here
+      //since param won't be changing while component is alive. 
+      //Could use this.route.parent.snapshot.params["id"] to simplify it.
+      this.route.parent.params.subscribe((params: Params) => {
+        let id = +params['id'];
+        if (id !== 0) {
+          this.operationText = 'Update';
+          this.getCustomer(id);
+        }
+      });
+
+  }
